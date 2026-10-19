@@ -418,6 +418,24 @@
           CARDS.forEach(function (c) { if (!key || key === c[0]) document.getElementById("out-" + c[0]).textContent = c[2](d, seeds[c[0]]); });
         }
 
+
+        var aiNote = document.createElement("p");
+        aiNote.className = "x-ai-note"; aiNote.style.cssText = "margin:0 0 12px;font-size:14px;opacity:.8";
+        results.parentNode.insertBefore(aiNote, results);
+        var busy = false;
+        function ai() {
+          if (busy) return; busy = true;
+          aiNote.textContent = "✨ Writing fresh AI copy for this listing…";
+          fetch("/.netlify/functions/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(read()) })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (o) {
+              var n = 0;
+              CARDS.forEach(function (c) { if (o[c[0]]) { document.getElementById("out-" + c[0]).textContent = o[c[0]]; n++; } });
+              aiNote.textContent = n ? "✨ Written by ListingKit AI. Tap Generate again for a new version." : "";
+            })
+            .catch(function () { aiNote.textContent = ""; })
+            .then(function () { busy = false; });
+        }
         function fallbackCopy(t) {
           var ta = document.createElement("textarea");
           ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
@@ -447,6 +465,7 @@
           Object.keys(seeds).forEach(function (k) { seeds[k] = Math.floor(Math.random() * 4); });
           render();
           results.scrollIntoView({ behavior: "smooth", block: "start" });
+          ai();
         });
         form.elements.listing.addEventListener("change", function () { if (this.value === "land") form.elements.ptype.value = "Land/Plot"; });
 
