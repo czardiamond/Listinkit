@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ListingKit Free Caption Generator</title>
+    <meta name="description" content="Free real estate caption generator: Instagram, TikTok and WhatsApp captions, a 30-second tour script and a portal description for any listing, any country, any currency." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap"
+    />
+    <link rel="stylesheet" href="hark.css" />
+    <link rel="stylesheet" href="hark-hero.css" />
+    <style>
+      .x-form { display: grid; gap: 20px; padding: 22px 24px; border-radius: var(--r-m); background: var(--fill-tertiary); }
+      .x-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px 16px; }
+      .x-field { display: grid; gap: 6px; min-width: 0; }
+      .x-field > span, .x-legend { font: var(--type-label); color: var(--text-secondary); }
+      .x-field input, .x-field select {
+        width: 100%; min-height: var(--tap); padding: 8px 12px;
+        border: 1px solid var(--stroke-primary); border-radius: var(--r-s);
+        background: var(--fill-primary-on); color: var(--text-primary); font: var(--type-body);
+      }
+      .x-price { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; }
+      .x-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; border: 0; padding: 0; }
+      .x-chips label { position: relative; cursor: pointer; }
+      .x-chips input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+      .x-chips span {
+        display: inline-flex; align-items: center; min-height: var(--tap); padding: 6px 14px;
+        border: 1px solid var(--stroke-primary); border-radius: var(--r-pill);
+        background: var(--fill-primary-on); font: var(--type-tag);
+        transition: background var(--dur-quick) var(--ease-out);
+      }
+      .x-chips input:checked + span { background: var(--fill-primary); color: var(--text-primary-on); border-color: var(--fill-primary); }
+      .x-chips input:focus-visible + span { outline: 2px solid var(--fill-primary); outline-offset: 3px; }
+      .x-go { justify-self: start; min-height: var(--tap); padding: 10px 20px; border: 0; border-radius: var(--r-s); background: var(--fill-primary); color: var(--text-primary-on); font: var(--type-body-strong); cursor: pointer; }
+      .x-out { margin: 0 0 14px; padding: 14px 16px; border-radius: var(--r-s); background: var(--fill-primary-on); font: var(--type-small); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 460px; overflow: auto; }
+      .x-results { margin-top: 24px; }
+      .x-results .btn { cursor: pointer; }
+      .x-results > div { min-width: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="page" id="top">
+      <header class="nav glass" data-auto></header>
+      <main class="main">
+        <section class="hero">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">ListingKit · Free tool</p>
+            <h1>Free Listing Caption Generator</h1>
+            <p class="hero__sub">Fill in one listing and get an Instagram caption, a TikTok caption, a WhatsApp broadcast, a 30-second tour script and a portal description.</p>
+            <p class="hero__meta">Any country · any currency · runs in your browser</p>
+          </div>
+        </section>
+
+        <section class="section" id="tool" data-nav="Generator">
+          <div class="head">
+            <h2>Describe the property, then copy your content.</h2>
+            <p class="head__sub">The example below is filled in. Change anything and press Generate.</p>
+          </div>
+
+          <form class="x-form" id="f" novalidate>
+            <div class="x-grid">
+              <label class="x-field"><span>Agent or agency name</span><input name="agent" value="Prime Homes Realty" autocomplete="organization" /></label>
+              <label class="x-field"><span>Phone / WhatsApp</span><input name="phone" value="+234 913 322 7445" inputmode="tel" autocomplete="tel" /></label>
+              <label class="x-field"><span>Listing type</span>
+                <select name="listing">
+                  <option value="sale" selected>For sale</option>
+                  <option value="rent">For rent</option>
+                  <option value="shortlet">Shortlet</option>
+                  <option value="land">Land</option>
+                </select>
+              </label>
+              <label class="x-field"><span>Property type</span>
+                <select name="ptype">
+                  <option>Apartment/Flat</option>
+                  <option selected>Duplex</option>
+                  <option>Detached house</option>
+                  <option>Terraced house</option>
+                  <option>Bungalow</option>
+                  <option>Penthouse</option>
+                  <option>Mini-flat/Studio</option>
+                  <option>Land/Plot</option>
+                  <option>Commercial</option>
+                </select>
+              </label>
+              <label class="x-field"><span>Bedrooms</span><input name="beds" type="number" min="0" value="4" inputmode="numeric" /></label>
+              <label class="x-field"><span>Bathrooms</span><input name="baths" type="number" min="0" value="5" inputmode="numeric" /></label>
+              <label class="x-field"><span>Area / neighbourhood</span><input name="area" value="Lekki Phase 1" placeholder="e.g. Lekki Phase 1" /></label>
+              <label class="x-field"><span>City</span><input name="city" value="Lagos" /></label>
+              <label class="x-field"><span>Country</span><input name="country" value="Nigeria" /></label>
+              <div class="x-field"><span>Price</span>
+                <div class="x-price">
+                  <input name="price" type="number" min="0" value="250000000" inputmode="numeric" aria-label="Price" />
+                  <select name="cur" aria-label="Currency">
+                    <option value="NGN" selected>₦ NGN</option>
+                    <option value="USD">$ USD</option>
+                    <option value="GBP">£ GBP</option>
+                    <option value="EUR">€ EUR</option>
+                    <option value="GHS">GH₵ GHS</option>
+                    <option value="KES">KSh KES</option>
+                  </select>
+                </div>
+              </div>
+              <label class="x-field"><span>Tone</span>
+                <select name="tone">
+                  <option value="luxury" selected>Luxury</option>
+                  <option value="friendly">Friendly</option>
+                  <option value="urgent">Urgent / Hot deal</option>
+                  <option value="pro">Professional</option>
+                </select>
+              </label>
+            </div>
+            <fieldset class="x-chips" id="feats">
+              <legend class="x-legend">Key features</legend>
+            </fieldset>
+            <label class="x-field"><span>Other features <small>comma separated</small></span><input name="other" value="Fully detached" placeholder="e.g. Cinema room, Rooftop terrace" /></label>
+            <button class="x-go" type="submit">Generate my content</button>
+          </form>
+
+          <div class="cards x-results" id="results" aria-live="polite"></div>
+        </section>
+
+        <section class="section" id="early" data-nav="Early access">
+          <aside class="callout" aria-label="Early access">
+            <p class="callout__head"><span class="hark-mark" data-size="16"></span> ListingKit Pro</p>
+            <p class="callout__lead"><strong>Want flyers, your logo on everything and unlimited listings?</strong> Join ListingKit early access. The first 100 agents get 3 months of Pro free.</p>
+            <div class="links">
+              <a class="btn" href="https://wa.me/2349133227445?text=Hi%20ListingKit%2C%20I%20tried%20the%20free%20generator%20and%20I%27d%20like%20early%20access." target="_blank" rel="noopener">Join on WhatsApp</a>
+              <a class="btn" href="mailto:anyanwudiamond@gmail.com?subject=ListingKit%20early%20access">Join by email</a>
+            </div>
+          </aside>
+        </section>
+
+        <section class="section" id="about" data-nav="About">
+          <div class="head"><h2>Free real estate caption generator</h2></div>
+          <div class="prose">
+            <p>Agents use ListingKit to turn one set of property details into ready-to-post <strong>Instagram</strong> captions, with a strong hook, emoji feature bullets, the price, a call to action and local hashtags like #LekkiHomes or #DublinProperty.</p>
+            <p>For <strong>TikTok</strong> and Reels you get a short, punchy caption plus a shot-by-shot 30-second tour script with on-screen text, so you know exactly what to film before you walk in.</p>
+            <p>For <strong>WhatsApp</strong> broadcasts and status, it writes a bold, scannable message with your name and number and a "Reply YES" call to action, plus a clean description for property portals.</p>
+          </div>
+        </section>
+
+        <section class="section" id="faq" data-nav="FAQ">
+          <div class="head"><h2>Questions agents ask</h2></div>
+          <div class="cards">
+            <div><h3>Is it free?</h3><p>Yes. Generate as many captions as you like.</p></div>
+            <div><h3>Does it work for any country and currency?</h3><p>Yes. Type any area, city and country, and choose naira, dollars, pounds, euros, cedis or shillings.</p></div>
+            <div><h3>Do you store my data?</h3><p>No. Everything runs in your browser; nothing is sent or saved.</p></div>
+          </div>
+        </section>
+      </main>
+      <footer class="foot">
+        <p>ListingKit — built in Lagos for agents everywhere.</p>
+        <nav aria-label="Back to sections" data-auto></nav>
+        <a class="badge" href="https://hark.com/" target="_blank" rel="noopener"><span class="hark-mark"></span><span>built by hark</span></a>
+      </footer>
+    </div>
+    <script src="hark.js"></script>
+    <script>
+      (function () {
+        var FEATS = [
+          ["Swimming pool", "🏊", true], ["BQ/Staff quarters", "🏠", true], ["Fitted kitchen", "🍳", true],
+          ["24/7 power", "⚡", false], ["Security", "🛡️", false], ["Gym", "🏋️", false], ["Parking", "🚗", false],
+          ["Garden", "🌿", false], ["Sea view", "🌊", false], ["Furnished", "🛋️", false], ["Elevator", "🛗", false],
+          ["Smart home", "📱", false], ["Balcony", "🌇", false], ["Newly built", "✨", false]
+        ];
+        var EMO = {};
+        var box = document.getElementById("feats");
+        FEATS.forEach(function (f) {
+          EMO[f[0]] = f[1];
+          var l = document.createElement("label");
+          l.innerHTML = '<input type="checkbox" name="feat" value="' + f[0] + '"' + (f[2] ? " checked" : "") + "><span>" + f[0] + "</span>";
+          box.appendChild(l);
+        });
+
+        var SYM = { NGN: "₦", USD: "$", GBP: "£", EUR: "€", GHS: "GH₵", KES: "KSh " };
+        var NOUN = {
+          "Apartment/Flat": ["apartment", "Apartment"], "Duplex": ["duplex", "Duplex"], "Detached house": ["detached house", "House"],
+          "Terraced house": ["terraced house", "TerracedHouse"], "Bungalow": ["bungalow", "Bungalow"], "Penthouse": ["penthouse", "Penthouse"],
+          "Mini-flat/Studio": ["mini-flat", "Studio"], "Land/Plot": ["plot of land", "Land"], "Commercial": ["commercial property", "CommercialProperty"]
+        };
+        var seeds = { ig: 0, tt: 0, wa: 0, vid: 0, desc: 0 };
+        var form = document.getElementById("f");
+
+        function pick(arr, n) { return arr[((n % arr.length) + arr.length) % arr.length]; }
+        function tag(s) { return (s || "").replace(/[^A-Za-z0-9 ]/g, " ").split(/\s+/).filter(Boolean).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(""); }
+
+        function read() {
+          var g = function (n) { return (form.elements[n].value || "").trim(); };
+          var feats = Array.prototype.slice.call(form.querySelectorAll('input[name="feat"]:checked')).map(function (i) { return i.value; });
+          var other = g("other").split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+          var d = {
+            agent: g("agent"), phone: g("phone"), listing: g("listing"), ptype: g("ptype"),
+            beds: parseInt(g("beds"), 10), baths: parseInt(g("baths"), 10),
+            area: g("area"), city: g("city"), country: g("country"), price: parseFloat(g("price")),
+            cur: g("cur"), tone: g("tone"), feats: feats, other: other
+          };
+          d.isLand = d.listing === "land" || d.ptype === "Land/Plot";
+          var nn = NOUN[d.ptype] || ["property", "Property"];
+          d.noun = d.isLand ? "plot of land" : nn[0];
+          d.tagNoun = d.isLand ? "Land" : nn[1];
+          d.beds = isNaN(d.beds) ? 0 : d.beds;
+          d.baths = isNaN(d.baths) ? 0 : d.baths;
+          var lead = other.filter(function (o) { return /detached|semi|terrace/i.test(o); })[0];
+          var nounFull = (lead && !d.isLand ? lead.toLowerCase() + " " : "") + d.noun;
+          d.title = (!d.isLand && d.beds > 0 ? d.beds + "-bedroom " : "") + nounFull;
+          d.Title = d.title.charAt(0).toUpperCase() + d.title.slice(1);
+          d.place = [d.area, d.city].filter(Boolean).join(", ");
+          d.placeFull = [d.area, d.city, d.country].filter(Boolean).join(", ");
+          d.where = d.place ? " in " + d.place : "";
+          d.status = { sale: "for sale", rent: "for rent", shortlet: "available as a shortlet", land: "for sale" }[d.listing];
+          d.tagStatus = { sale: "ForSale", rent: "ForRent", shortlet: "Shortlet", land: "ForSale" }[d.listing];
+          d.allFeats = feats.concat(other.filter(function (o) { return o !== lead; }));
+          if (!isNaN(d.price) && d.price > 0) {
+            var per = d.listing === "rent" ? (d.cur === "NGN" ? "/year" : "/month") : d.listing === "shortlet" ? "/night" : "";
+            d.priceTxt = SYM[d.cur] + Math.round(d.price).toLocaleString("en-US") + per;
+          } else d.priceTxt = "Price on request";
+          d.rooms = d.isLand ? "" : [d.beds ? d.beds + " bedroom" + (d.beds > 1 ? "s" : "") : "", d.baths ? d.baths + " bathroom" + (d.baths > 1 ? "s" : "") : ""].filter(Boolean).join(" · ");
+          d.contact = [d.agent, d.phone].filter(Boolean).join(" · ");
+          return d;
+        }
+
+        function bullets(d) {
+          var out = [];
+          if (d.rooms) out.push("🛏️ " + d.rooms);
+          d.allFeats.forEach(function (f) { out.push((EMO[f] || "✅") + " " + f); });
+          if (d.place) out.push("📍 " + d.placeFull);
+          return out;
+        }
+
+        function hashtags(d, n, count) {
+          var a = tag(d.area), a1 = tag((d.area || "").split(/\s+/)[0]), c = tag(d.city), k = tag(d.country);
+          var list = [];
+          if (a1) list.push(a1 + "Homes");
+          if (c) list.push(c + "RealEstate", c + "Property");
+          list.push(d.tagNoun + d.tagStatus);
+          if (a && a !== a1) list.push(a);
+          if (c) list.push(c + "Homes");
+          if (k) list.push(k + "RealEstate");
+          if (/nigeria/i.test(d.country)) list.push("NaijaRealEstate");
+          if (c) list.push(d.tagNoun + c);
+          var gen = d.isLand ? ["LandForSale", "RealEstateInvestment", "PlotForSale", "LandInvestment"] :
+            d.listing === "rent" ? ["HouseForRent", "ApartmentHunting", "HomeForRent", "RentalProperty"] :
+            d.listing === "shortlet" ? ["ShortletApartment", "VacationRental", "StaycationVibes", "ShortStay"] :
+            ["PropertyForSale", "DreamHome", "HouseHunting", "HomeForSale"];
+          var toneTags = { luxury: ["LuxuryHomes", "LuxuryRealEstate"], friendly: ["HomeSweetHome", "NewHome"], urgent: ["HotDeal", "DontMissOut"], pro: ["RealEstateAgent", "PropertyInvestment"] }[d.tone];
+          var extra = gen.concat(toneTags, ["RealEstate", "RealtorLife"]);
+          var s = n % extra.length;
+          extra = extra.slice(s).concat(extra.slice(0, s));
+          list = list.concat(extra);
+          var seen = {}, res = [];
+          list.forEach(function (t) { var key = t.toLowerCase(); if (t && !seen[key] && res.length < count) { seen[key] = 1; res.push("#" + t); } });
+          return res.join(" ");
+        }
+
+        var HOOKS = {
+          luxury: [
+            "✨ Luxury living{where} just got a new address.",
+            "💎 Step into elegance: {a} {title}{where}.",
+            "🥂 For those who expect more. Meet this {title}{where}.",
+            "👑 Where class meets comfort{where}.",
+            "🌟 Rare find: an exquisite {title}{where}."
+          ],
+          friendly: [
+            "🏡 Your next home might be waiting{where}!",
+            "😍 Fall in love with this {title}{where}.",
+            "👋 Hey house hunters! Look what just landed{where}.",
+            "🔑 Picture yourself here: a lovely {title}{where}.",
+            "💛 Room to live, laugh and grow{where}."
+          ],
+          urgent: [
+            "🔥 HOT DEAL ALERT! {Title} {status}{where}.",
+            "🚨 This won't last! {Title}{where}.",
+            "⏳ Move fast: {a} {title} just hit the market{where}.",
+            "💥 Price is right, location is right. Act now!",
+            "⚡ JUST LISTED{where}. Serious buyers, this is it!"
+          ],
+          pro: [
+            "📢 New listing: {title} {status}{where}.",
+            "🏢 Now available: a well-presented {title}{where}.",
+            "📌 Property spotlight: {title}{where}.",
+            "🗝️ On the market: {title}{where}.",
+            "📊 A sound investment{where}: {title} {status}."
+          ]
+        };
+        var CTAS = {
+          luxury: ["📩 DM for a private viewing.", "🗓️ Private inspections by appointment only.", "📲 Send a DM to arrange your exclusive tour.", "🤝 Discreet enquiries welcome. Message us today."],
+          friendly: ["💬 Drop a DM or comment 'INFO' and we'll send details!", "📲 Message us to book a viewing, we'd love to show you around!", "👇 Tag someone who needs to see this!", "📅 Come see it this week. Just send a DM!"],
+          urgent: ["🏃 DM NOW before it's gone!", "📲 Call or DM today. Inspections filling up fast!", "⏰ First come, first served. Message us now!", "🚀 Don't sleep on this one. DM to book inspection!"],
+          pro: ["📞 Contact us to schedule an inspection.", "📩 For enquiries and viewings, send a DM.", "🗓️ Inspections available on request.", "📋 Full details available. Get in touch today."]
+        };
+
+        function fill(s, d) {
+          return s.replace(/\{where\}/g, d.where).replace(/\{title\}/g, d.title).replace(/\{Title\}/g, d.Title)
+            .replace(/\{status\}/g, d.status).replace(/\{a\}/g, /^[aeiou8]/i.test(d.title) ? "an" : "a").replace(/\{place\}/g, d.place || "a great location").replace(/\{price\}/g, d.priceTxt);
+        }
+        function sign(d, pre) { return d.contact ? "\n\n" + (pre || "📞 ") + d.contact : ""; }
+
+        function instagram(d, n) {
+          var hook = fill(pick(HOOKS[d.tone], n), d);
+          var intro = fill(pick({
+            luxury: ["A beautifully finished {title} {status}{where}, designed for refined living.", "Exceptional finishing, generous space and a prime address{where}.", "This {title} {status} offers the lifestyle you deserve.", "Crafted for comfort and status, right{where}."],
+            friendly: ["This {title} {status}{where} is ready for its next family.", "Space, comfort and a great neighbourhood, all in one place.", "We think you'll love this {title}{where}, here's why:", "Bright, comfy and in a spot you'll love."],
+            urgent: ["Priced to move, this {title}{where} won't stay long.", "Buyers are already calling. Don't miss this one!", "Location + value = SOLD soon. Here's what you get:", "Deals like this{where} go in days, not weeks."],
+            pro: ["A {title} {status}{where}. Key details below.", "Well-located and well-specified. Highlights:", "Ideal for end users and investors alike.", "Presented in good condition with the following features:"]
+          }[d.tone], n + 1), d);
+          var lines = [hook, "", intro, ""].concat(bullets(d), ["", "💰 " + (d.listing === "sale" || d.listing === "land" ? "Price: " : "") + d.priceTxt, "", pick(CTAS[d.tone], n + 2)]);
+          return lines.join("\n") + sign(d) + "\n\n" + hashtags(d, n, 8 + (n % 5));
+        }
+
+        function tiktok(d, n) {
+          var ls = {
+            luxury: ["POV: you just got the keys to this {title}{where} ✨🔑", "This is what {price} looks like{where} 💎", "Rate this {title} from 1 to 10 👀✨", "Luxury tour: {title}{where} 🥂"],
+            friendly: ["Would you live here? 🏡 {Title}{where} 😍", "Come tour this {title} with me! 🔑", "Your sign to start house hunting{where} 💛", "Okay but this kitchen though 😍 {Title}{where}"],
+            urgent: ["🚨 {price} for THIS?! {Title}{where} 🔥", "Gone by Friday 👀 {Title}{where}", "Run, don't walk 🏃 {title} {status}{where}", "Hottest listing{where} right now 🔥"],
+            pro: ["Inside a {title} {status}{where} 🏠", "Full tour: {title}{where}, {price} 📍", "Listing of the week: {title}{where} 📌", "What {price} gets you{where} 🏡"]
+          }[d.tone];
+          var second = pick(["Comment 'INFO' for details 👇", "DM to book an inspection 📲", "Follow for more listings{where} 🔔", "Save this for later ❤️"], n + 1).replace("{where}", d.place ? " in " + (d.city || d.area) : "");
+          return fill(pick(ls, n), d) + "\n" + second + (d.contact ? " · " + d.contact : "") + "\n\n" + hashtags(d, n + 3, 5);
+        }
+
+        function whatsapp(d, n) {
+          var head = pick({
+            luxury: ["*✨ EXCLUSIVE LISTING ✨*", "*💎 PREMIUM PROPERTY ALERT*", "*👑 LUXURY HOME AVAILABLE*", "*🥂 NEW TO MARKET: LUXURY*"],
+            friendly: ["*🏡 NEW HOME ALERT!*", "*😊 FRESH LISTING FOR YOU*", "*🔑 LOOKING FOR A HOME? SEE THIS!*", "*💛 JUST LISTED*"],
+            urgent: ["*🔥 HOT DEAL! ACT FAST 🔥*", "*🚨 URGENT SALE 🚨*", "*⏳ LIMITED TIME OFFER*", "*💥 BELOW-MARKET DEAL*"],
+            pro: ["*📢 PROPERTY AVAILABLE*", "*🏢 NEW LISTING*", "*📌 PROPERTY UPDATE*", "*🗝️ NOW ON THE MARKET*"]
+          }[d.tone], n);
+          var lines = [head, "", "*" + d.Title + " " + d.status + "*", d.place ? "📍 " + d.placeFull : ""].filter(function (x, i) { return i < 3 || x; });
+          lines.push("", "*Features:*");
+          bullets(d).filter(function (b) { return b.indexOf("📍") !== 0; }).forEach(function (b) { lines.push("• " + b); });
+          lines.push("", "*💰 Price: " + d.priceTxt + "*", "");
+          lines.push(pick(["👉 *Reply YES to book an inspection.*", "👉 *Reply YES and I'll send photos, video and inspection times.*", "👉 *Interested? Reply YES to schedule a viewing.*", "👉 *Reply YES to get the full details today.*"], n + 1));
+          if (d.agent) lines.push("", "*" + d.agent + "*");
+          if (d.phone) lines.push((d.agent ? "" : "\n") + "📞 Call/WhatsApp: " + d.phone);
+          lines.push("", "_Please share with anyone looking." + (d.tone === "urgent" ? " Serious buyers only._" : "_"));
+          return lines.join("\n");
+        }
+
+        function video(d, n) {
+          var f = d.allFeats, star = f.filter(function (x) { return /pool|sea|smart|garden|gym|view|cinema|roof/i.test(x); })[0] || f[0] || (d.isLand ? "Location" : "Finishing");
+          var hook = pick({
+            luxury: ["“Welcome to your next chapter.”", "“This is luxury{where}.”", "“Wait till you see the " + star.toLowerCase() + ".”", "“Private tour: {title}.”"],
+            friendly: ["“Come house hunting with me!”", "“Would you live here?”", "“Your future home might be in this video.”", "“Let me show you around!”"],
+            urgent: ["“This won't last a week.”", "“{price}? Let me show you why that's a steal.”", "“Stop scrolling. Hot deal{where}!”", "“Just listed and already getting calls.”"],
+            pro: ["“New listing{where}.”", "“Here's what {price} gets you.”", "“Property tour: {title}.”", "“30 seconds, one great property.”"]
+          }[d.tone], n);
+          var s = d.isLand ? [
+            ["0–3s", "Hook", "Drone or high shot over the plot.", hook],
+            ["3–8s", "Access road", "Drive in along the access road, showing the approach.", d.place || "Prime location"],
+            ["8–13s", "Boundaries", "Walk the boundary; show beacons or fence.", "Clear boundaries"],
+            ["13–17s", "Neighbourhood", "Pan to nearby estates, roads or landmarks.", "Developed area"],
+            ["17–22s", "Documents", "Close-up of title documents (blur details).", "Good title"],
+            ["22–26s", "Standout feature", "Show the strongest selling point: " + star + ".", star],
+            ["26–30s", "Price + CTA end card", "Agent to camera or branded end card.", d.priceTxt + " · DM to inspect"]
+          ] : [
+            ["0–3s", "Hook", "Fast push-in on the front of the property, or agent to camera.", hook],
+            ["3–8s", "Exterior", "Slow walk from the gate to the entrance; show facade and compound.", d.Title],
+            ["8–13s", "Living room", "Wide sweep across the living area from the doorway.", "Spacious living"],
+            ["13–17s", "Kitchen", "Glide past counters and cabinets; open a drawer.", f.indexOf("Fitted kitchen") > -1 ? "Fitted kitchen" : "Modern kitchen"],
+            ["17–22s", "Bedrooms", "Quick cuts of each bedroom, ending in the master.", d.beds ? d.beds + " bedrooms" + (d.baths ? " · " + d.baths + " baths" : "") : "Cosy rooms"],
+            ["22–26s", "Standout feature", "Hero shot of the " + star.toLowerCase() + ", slow and steady.", star],
+            ["26–30s", "Price + CTA end card", "Branded end card with price and contact.", d.priceTxt + " · " + (d.phone ? d.phone : "DM to book")]
+          ];
+          var out = ["🎬 30-second tour: " + d.title + (d.where || ""), ""];
+          s.forEach(function (r, i) {
+            out.push((i + 1) + ". [" + r[0] + "] " + r[1].toUpperCase(), "   Shot: " + r[2], "   On-screen text: " + fill(r[3], d), "");
+          });
+          out.push("🎵 Music: " + pick({ luxury: ["slow cinematic piano", "smooth deep house", "soft strings", "chill lounge beat"], friendly: ["upbeat acoustic pop", "feel-good trending sound", "light afrobeats", "happy ukulele"], urgent: ["fast trending beat", "high-energy afrobeats", "punchy drum loop", "countdown-style beat"], pro: ["clean corporate beat", "minimal lo-fi", "light ambient", "subtle piano"] }[d.tone], n));
+          out.push("💡 Tip: film in daylight, phone horizontal-stable, 1–2 seconds per cut.");
+          if (d.contact) out.push("📞 End card: " + d.contact);
+          return out.join("\n");
+        }
+
+        function description(d, n) {
+          var f = d.allFeats.map(function (x) { return x.toLowerCase().replace("bq/staff quarters", "a BQ (staff quarters)"); });
+          var flist = f.length > 1 ? f.slice(0, -1).join(", ") + " and " + f[f.length - 1] : f[0];
+          var open = pick([
+            "{a} {title} {status}{where}.",
+            "Presenting {a} {title} {status}{where}, " + (d.country ? d.country : "") + ".",
+            "This {title}{where} is now {status}.",
+            "We are pleased to offer {a} {title} {status}{where}."
+          ], n);
+          var parts = [fill(open, d).replace(/^a /, "A ").replace(/^an /, "An ").replace(", .", ".")];
+          if (!d.isLand && (d.beds || d.baths)) parts.push("The property comprises " + d.rooms.replace(" · ", " and ") + ", with well-proportioned rooms and good natural light throughout.");
+          if (d.isLand) parts.push("The plot offers a strong opportunity for residential or commercial development, with good access and a growing neighbourhood around it.");
+          if (flist) parts.push(pick(["Key features include " + flist + ".", "Highlights include " + flist + ".", "The home benefits from " + flist + ".", "Amenities include " + flist + "."], n + 1));
+          if (d.place) parts.push(pick(["Its location in " + d.place + " offers convenient access to shops, schools, restaurants and major roads.", d.place + " is a sought-after address with good road links and everyday amenities close by.", "Set in " + d.place + ", it is close to schools, shopping and business districts.", "The " + (d.area || d.city) + " location puts daily essentials and key routes within easy reach."], n + 2));
+          var price = d.priceTxt === "Price on request" ? "Price on request." : "Asking " + (d.listing === "rent" || d.listing === "shortlet" ? "rent" : "price") + ": " + d.priceTxt + ".";
+          parts.push(price);
+          var pads = ["It is suitable for both owner-occupiers and investors seeking long-term value.", "The property is well maintained and ready for immediate occupation.", "Viewing is highly recommended to appreciate the space and finishing on offer.", "Internal inspection is available by appointment."];
+          if (d.isLand) pads[1] = "Documents are available for verification on request.";
+          var wc = function () { return parts.join(" ").split(/\s+/).length; };
+          var i = 0;
+          var cta = "To arrange an inspection" + (d.contact ? ", contact " + d.contact + "." : ", get in touch today.");
+          while (wc() + cta.split(/\s+/).length < 85 && i < pads.length) { parts.splice(parts.length - 1, 0, pick(pads, n + i)); i++; }
+          parts.push(cta);
+          return parts.join(" ");
+        }
+
+        var CARDS = [
+          ["ig", "Instagram caption", instagram],
+          ["tt", "TikTok caption", tiktok],
+          ["wa", "WhatsApp broadcast", whatsapp],
+          ["vid", "30-second tour script", video],
+          ["desc", "Listing description", description]
+        ];
+        var results = document.getElementById("results");
+        results.innerHTML = CARDS.map(function (c) {
+          return '<div><h3>' + c[1] + '</h3><pre class="x-out" id="out-' + c[0] + '" tabindex="0"></pre><div class="links"><button type="button" class="btn" data-copy="' + c[0] + '">Copy</button><button type="button" class="btn" data-regen="' + c[0] + '">Regenerate</button></div></div>';
+        }).join("");
+
+        function render(key) {
+          var d = read();
+          CARDS.forEach(function (c) { if (!key || key === c[0]) document.getElementById("out-" + c[0]).textContent = c[2](d, seeds[c[0]]); });
+        }
+
+        function fallbackCopy(t) {
+          var ta = document.createElement("textarea");
+          ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.select();
+          var ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+          document.body.removeChild(ta); return ok;
+        }
+        function flash(btn, msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = "Copy"; }, 1600); }
+
+        results.addEventListener("click", function (e) {
+          var b = e.target.closest("button"); if (!b) return;
+          if (b.dataset.regen) { seeds[b.dataset.regen]++; render(b.dataset.regen); }
+          if (b.dataset.copy) {
+            var pre = document.getElementById("out-" + b.dataset.copy), t = pre.textContent;
+            var ok = fallbackCopy(t);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              try { navigator.clipboard.writeText(t).then(function () { flash(b, "Copied ✓"); }, function () {}); ok = true; } catch (err) {}
+            }
+            flash(b, ok ? "Copied ✓" : "Select and copy");
+            var r = document.createRange(); r.selectNodeContents(pre);
+            var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+          }
+        });
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          Object.keys(seeds).forEach(function (k) { seeds[k] = Math.floor(Math.random() * 4); });
+          render();
+          results.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        form.elements.listing.addEventListener("change", function () { if (this.value === "land") form.elements.ptype.value = "Land/Plot"; });
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

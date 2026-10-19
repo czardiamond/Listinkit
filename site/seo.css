@@ -1,0 +1,41 @@
+/* ListingKit SEO template pages. Builds on hark.css tokens. */
+.topbar { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 10px); z-index: 20; justify-self: center; max-width: 100%; display: flex; padding: 5px; border-radius: var(--r-pill); box-shadow: var(--hark-shadow); }
+.topbar .seg a.brand { color: var(--text-primary-on); font-weight: var(--weight-bold); }
+.crumbs { font-size: var(--size-small); color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.crumbs li + li::before { content: "/"; margin-right: 6px; color: var(--text-tertiary); }
+.crumbs a { color: inherit; }
+.intro { display: grid; gap: 14px; padding-block: clamp(24px, 5vw, 56px) 8px; }
+.intro__eyebrow { font: var(--type-label); color: var(--text-secondary); }
+.intro h1 { font: var(--type-display); max-width: 22ch; }
+.intro .lede { font: var(--type-lede); color: var(--text-secondary); max-width: 60ch; }
+.intro .prose p + p { margin-top: 0; }
+.tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+.tpl { display: grid; grid-template-rows: auto 1fr auto; gap: 10px; padding: 18px 20px; border-radius: var(--r-m); background: var(--fill-tertiary); min-width: 0; }
+.tpl h3 { font: var(--type-body-strong); }
+.tpl h3 small { display: block; color: var(--text-secondary); font-weight: var(--weight-regular); margin-top: 2px; }
+.tpl pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: var(--type-body); font-family: var(--sans); line-height: 1.45; }
+.tpl .copy { justify-self: start; cursor: pointer; }
+.group-title { font: var(--type-heading); margin: 28px 0 12px; }
+.group-title:first-child { margin-top: 0; }
+.tips { margin: 0; padding-left: 1.3em; display: grid; gap: 10px; max-width: 70ch; font-size: var(--size-prose); }
+.tips li::marker { color: var(--text-secondary); }
+.faq { display: grid; gap: 10px; max-width: 78ch; }
+.faq details { padding: 14px 18px; border-radius: var(--r-s); background: var(--fill-tertiary); }
+.faq summary { cursor: pointer; font-weight: var(--weight-medium); }
+.faq details p { margin-top: 10px; color: var(--text-secondary); }
+.related { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.related a { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border-radius: var(--r-pill); background: var(--fill-tertiary); color: var(--text-primary); text-decoration: none; font: var(--type-label); }
+.related a:hover { box-shadow: inset 0 0 0 100px var(--hover-wash); }
+.hub-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.hub-list a { display: grid; gap: 4px; height: 100%; padding: 16px 18px; border-radius: var(--r-m); background: var(--fill-tertiary); text-decoration: none; }
+.hub-list a strong { font-weight: var(--weight-medium); }
+.hub-list a span { color: var(--text-secondary); font-size: var(--size-small); }
+.hub-list a:hover { box-shadow: inset 0 0 0 100px var(--hover-wash); }
+.callout--wide { max-width: 640px; }
+.table-scroll { overflow-x: auto; }
+.cmp { width: 100%; border-collapse: collapse; font-size: var(--size-small); min-width: 520px; }
+.cmp th, .cmp td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--stroke-secondary); }
+.cmp thead th { font-weight: var(--weight-medium); color: var(--text-secondary); }
+.cmp tbody th { font-weight: var(--weight-medium); }
+.note { font-size: var(--size-small); color: var(--text-secondary); max-width: 70ch; }
+@media (max-width: 599px) { .intro h1 { font-size: 30px; } .tpl { padding: 16px; } }
