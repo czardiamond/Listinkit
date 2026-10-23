@@ -156,22 +156,22 @@ def hub_list(items, registry):
 def build_hubs(pages, registry):
     hubs = []
     hub_meta = {
-        "captions": dict(title="Real Estate Captions for Instagram, TikTok & WhatsApp (Free Templates) | ListingKit",
+        "captions": dict(title="Real Estate Captions for Instagram, TikTok & WhatsApp | ListingKit",
                          meta="Free real estate caption templates for just listed, sold, open house, price reduced, land, off-plan, shortlet, luxury, rental and commercial listings.",
                          h1="Real estate captions for every listing moment", lede="Pick the moment, copy the caption, swap in your details. Every page has Instagram, TikTok and WhatsApp status versions."),
         "whatsapp": dict(title="WhatsApp Broadcast Messages for Real Estate Agents (Templates) | ListingKit",
                          meta="Free WhatsApp broadcast templates for realtors: new listing, land, off-plan launch, inspection invite, price drop, follow-up and rent/shortlet messages.",
                          h1="WhatsApp broadcast templates for real estate", lede="Most African agents close on WhatsApp, not Instagram. These are broadcast-list messages built to get replies, not blue ticks."),
-        "descriptions": dict(title="Property Listing Description Templates by Area — Lagos, Abuja, PH, Accra, Nairobi, Dubai | ListingKit",
-                             meta="Free property description templates for duplexes, flats, land, terraces, bungalows and shortlets in Lekki, Ikoyi, VI, Ajah, Ikeja, Abuja, Port Harcourt, Accra, Nairobi and Dubai.",
+        "descriptions": dict(title="Property Listing Descriptions: Lagos, Abuja, PH, Accra, Nairobi, Dubai",
+                             meta="Property description templates for duplexes, flats, land, terraces, bungalows, shortlets in Lekki, Ikoyi, VI, Ajah, Ikeja, Abuja, Port Harcourt, Accra, Nairobi and Dubai.",
                              h1="Property description templates by area", lede="Area-specific listing descriptions for portals, flyers and WhatsApp. Fill the blanks, keep the local detail buyers search for."),
-        "hashtags": dict(title="Real Estate Hashtags by City — Lagos, Abuja, Accra, Nairobi, Dubai, London | ListingKit",
+        "hashtags": dict(title="Real Estate Hashtags — Lagos, Abuja, Accra, Nairobi, Dubai | ListingKit",
                          meta="Copy-ready real estate hashtag sets grouped by city and listing type for Lagos, Abuja, Port Harcourt, Accra, Nairobi, Dubai and London agents.",
                          h1="Real estate hashtags by city", lede="Grouped sets you can paste under a post: broad, area, property type and buyer intent."),
         "guides": dict(title="Real Estate Marketing Guides for Agents in Nigeria & Beyond | ListingKit",
                        meta="Practical guides for agents: how to advertise land for sale in Nigeria, ChatGPT prompts for real estate, and TikTok/reel script ideas.",
                        h1="Marketing guides for real estate agents", lede="Short, practical playbooks with templates you can use today."),
-        "alternatives": dict(title="ListingKit vs PropClips, ListingAI & Canva — Real Estate Tool Alternatives | ListingKit",
+        "alternatives": dict(title="ListingKit vs PropClips, ListingAI & Canva | Real Estate Tools",
                              meta="Honest comparisons of ListingKit with PropClips, ListingAI and Canva for realtors: pricing, WhatsApp support, flyers, video scripts and naira pricing.",
                              h1="Real estate marketing tool alternatives", lede="Where ListingKit fits next to the tools agents already know, with prices as shown on each tool's own site in October 2026."),
     }
@@ -195,7 +195,7 @@ def build_hubs(pages, registry):
         children = [p["path"] for p in pages if p.get("section") == key]
         res_extra.append((key, name, f'<p class="note" style="margin-bottom:14px">{E(blurb)} <a class="link" href="{path}">See the {E(name.lower())} hub</a></p>' + hub_list(children, registry)))
     hubs.append(dict(path="/resources/", crumb="Free templates", eyebrow="ListingKit resources",
-                     title="Free Real Estate Marketing Templates — Captions, WhatsApp, Descriptions | ListingKit",
+                     title="Free Real Estate Marketing Templates | ListingKit",
                      meta="Every free ListingKit template in one place: real estate captions, WhatsApp broadcasts, property descriptions by area, hashtags, guides and tool comparisons.",
                      h1="Free real estate marketing templates", lede="Captions, WhatsApp broadcasts, area descriptions, hashtags and guides, written for how agents in Africa and beyond actually sell.",
                      intro=["Every template here is free to copy. When you'd rather not fill blanks by hand, the <a class=\"link\" href=\"/generator/\">free ListingKit generator</a> writes all of them from one property input."],
@@ -331,3 +331,7 @@ if __name__ == "__main__":
         for x in probs:
             print("PROBLEM", x)
         print("problems:", len(probs))
+        # A check command must be usable by CI and deploy scripts. Printing
+        # validation failures with status 0 made broken output look successful.
+        if probs:
+            sys.exit(1)
