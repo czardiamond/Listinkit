@@ -687,3 +687,13 @@ tr.is-highlight > :last-child { box-shadow: 12px 0 var(--fill-tertiary); }
 .band img { width: 100%; height: clamp(240px, 40vw, 520px); object-fit: cover; border-radius: var(--r-xl); }
 .band figcaption { font-size: var(--size-caption); color: var(--text-secondary); padding: 10px 4px 0; }
 .is-portrait img { width: auto; max-width: 100%; height: clamp(320px, 48vw, 560px); }
+
+/* Motion refresh: listing creation and ready-to-post feedback */
+@keyframes listingkit-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes listingkit-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,77,0,0); } 50% { box-shadow: 0 0 0 6px rgba(255,77,0,.12); } }
+.hero__copy, .hero .callout, .section, .step, .cards > div, .compare, .aside { animation: listingkit-rise 500ms var(--ease-out) both; }
+.hero .callout { animation-delay: 90ms; }
+.cards > div:hover, .step:hover { transform: translateY(-3px); transition: transform var(--dur-quick) var(--ease-out), box-shadow var(--dur-quick) ease; box-shadow: var(--hark-shadow); }
+.btn:hover { transform: translateY(-1px); transition: transform var(--dur-quick) var(--ease-out), box-shadow var(--dur-quick) ease; }
+.callout .btn:first-of-type { animation: listingkit-glow 2.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
