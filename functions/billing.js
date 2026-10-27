@@ -1,58 +1,85 @@
-// ListingKit billing via Paystack. Env: PAYSTACK_SECRET_KEY.
-const crypto = require("crypto");
+// ListingKit billing via Paystack. Required env: PAYSTACK_SECRET_KEY, FIREBASE_API_KEY, FIREBASE_PROJECT_ID.
 const PLANS = { pro: process.env.PLAN_PRO || "PLN_fn0d88ppmuypnoi", agency: process.env.PLAN_AGENCY || "PLN_hk1g6bg3rs0ddjl" };
 const SITE = "https://listingkit-ai.netlify.app";
-const H = { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type" };
+const H = { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type, Authorization" };
 const KEY = () => process.env.PAYSTACK_SECRET_KEY;
+const FIREBASE_KEY = () => process.env.FIREBASE_API_KEY || process.env.FIREBASE_WEB_API_KEY;
+const FIREBASE_PROJECT = () => process.env.FIREBASE_PROJECT_ID;
+// Deliberately hard-disabled: pending is process memory and cannot durably fulfil payments after a cold start.
+const BILLING_FULFILMENT_READY = false;
+const pending = new Map();
 const ps = async (path, opt = {}) => {
   const r = await fetch("https://api.paystack.co" + path, { ...opt, headers: { Authorization: "Bearer " + KEY(), "Content-Type": "application/json" } });
   return r.json();
 };
-const sign = (email, plan) => {
-  const exp = Date.now() + 35 * 864e5;
-  const body = Buffer.from(JSON.stringify({ email, plan, exp })).toString("base64url");
-  return body + "." + crypto.createHmac("sha256", KEY()).update(body).digest("base64url");
+const decodePayload = (token) => {
+  try {
+    const part = String(token).split(".")[1];
+    if (!part) return null;
+    return JSON.parse(Buffer.from(part.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8"));
+  } catch { return null; }
 };
-const planOf = (code) => Object.keys(PLANS).find((k) => PLANS[k] === code) || "pro";
+const lookupFirebaseToken = async (token) => {
+  if (!FIREBASE_KEY() || !FIREBASE_PROJECT() || !token) return null;
+  const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + encodeURIComponent(FIREBASE_KEY()), {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken: token })
+  });
+  if (!r.ok) return null;
+  const j = await r.json();
+  const u = j && Array.isArray(j.users) ? j.users[0] : null;
+  // accounts:lookup validates the token signature. Only after that success do we inspect its claims.
+  const claims = decodePayload(token);
+  const provider = claims && claims.firebase && claims.firebase.sign_in_provider;
+  const expectedIssuer = "https://securetoken.google.com/" + FIREBASE_PROJECT();
+  if (!u || !u.localId || u.disabled || (!u.email && !(Array.isArray(u.providerUserInfo) && u.providerUserInfo.length))) return null;
+  if (!claims || claims.aud !== FIREBASE_PROJECT() || claims.iss !== expectedIssuer || claims.sub !== u.localId || !provider || provider === "anonymous") return null;
+  return { uid: u.localId, email: String(u.email || "").trim().toLowerCase() };
+};
+const authUser = async (event) => {
+  const h = event.headers || {};
+  const raw = h.authorization || h.Authorization || "";
+  const m = /^Bearer\s+([^\s]+)$/.exec(raw);
+  return m ? lookupFirebaseToken(m[1]) : null;
+};
 const ok = (o) => ({ statusCode: 200, headers: H, body: JSON.stringify(o) });
 const bad = (c, e) => ({ statusCode: c, headers: H, body: JSON.stringify({ error: e }) });
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: H, body: "" };
-  if (!KEY()) return bad(503, "billing not configured");
+  if (event.httpMethod !== "POST") return bad(405, "POST only");
   let d = {};
-  try { d = JSON.parse(event.body || "{}"); } catch {}
-  const q = event.queryStringParameters || {};
-  const action = d.action || q.action;
-  const email = String(d.email || q.email || "").trim().toLowerCase();
+  try { d = JSON.parse(event.body || "{}"); } catch { return bad(400, "bad json"); }
+  const action = d.action;
+  if (!KEY() || !FIREBASE_KEY() || !FIREBASE_PROJECT()) return bad(503, "billing not configured");
+  const user = await authUser(event);
+  if (!user) return bad(401, "authenticated non-anonymous account required");
   try {
     if (action === "checkout") {
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return bad(400, "valid email needed");
-      const plan = PLANS[d.plan] ? d.plan : "pro";
-      const r = await ps("/transaction/initialize", { method: "POST", body: JSON.stringify({ email, amount: plan === "agency" ? 1500000 : 500000, plan: PLANS[plan], callback_url: SITE + "/generator/?paid=1", metadata: { product: "ListingKit", plan } }) });
-      if (!r.status) return bad(502, r.message || "paystack error");
-      return ok({ url: r.data.authorization_url });
+      if (!BILLING_FULFILMENT_READY) return bad(503, "checkout unavailable until durable payment fulfilment is implemented");
+      const plan = PLANS[d.plan] ? d.plan : null;
+      if (!plan) return bad(400, "valid plan needed");
+      const metadata = { product: "ListingKit", plan, uid: user.uid };
+      const r = await ps("/transaction/initialize", { method: "POST", body: JSON.stringify({ email: user.email, amount: plan === "agency" ? 1500000 : 500000, plan: PLANS[plan], callback_url: SITE + "/generator/", metadata }) });
+      if (!r.status || !r.data || !r.data.authorization_url || !r.data.reference) return bad(502, r.message || "paystack error");
+      pending.set(String(r.data.reference), { uid: user.uid, email: user.email, plan });
+      return ok({ url: r.data.authorization_url, reference: r.data.reference });
     }
     if (action === "verify") {
-      const ref = String(d.reference || q.reference || "");
-      if (ref) {
-        const r = await ps("/transaction/verify/" + encodeURIComponent(ref));
-        if (r.status && r.data && r.data.status === "success") {
-          const em = r.data.customer.email.toLowerCase();
-          const plan = (r.data.metadata && r.data.metadata.plan) || (r.data.plan_object && planOf(r.data.plan_object.plan_code)) || "pro";
-          return ok({ active: true, email: em, plan, token: sign(em, plan) });
-        }
-        return ok({ active: false });
-      }
-      if (email) {
-        const c = await ps("/customer/" + encodeURIComponent(email));
-        const subs = (c.status && c.data && c.data.subscriptions) || [];
-        const live = subs.find((s) => ["active", "non-renewing", "attention"].includes(s.status));
-        if (live) { const plan = planOf(live.plan && live.plan.plan_code); return ok({ active: true, email, plan, token: sign(email, plan) }); }
-        return ok({ active: false });
-      }
-      return bad(400, "reference or email needed");
+      if (!BILLING_FULFILMENT_READY) return bad(503, "payment verification unavailable until durable payment fulfilment is implemented");
+      const ref = String(d.reference || "").trim();
+      if (!ref) return bad(400, "reference needed");
+      const owner = pending.get(ref);
+      if (!owner || owner.uid !== user.uid) return bad(403, "payment ownership could not be established");
+      const r = await ps("/transaction/verify/" + encodeURIComponent(ref));
+      if (!r.status || !r.data || r.data.status !== "success") return ok({ active: false });
+      const metadata = r.data.metadata || {};
+      const customerEmail = String(r.data.customer && r.data.customer.email || "").trim().toLowerCase();
+      if (String(metadata.uid || "") !== user.uid || customerEmail !== user.email || metadata.plan !== owner.plan) return bad(403, "payment ownership mismatch");
+      pending.delete(ref);
+      return ok({ active: true, uid: user.uid, plan: owner.plan });
     }
     return bad(400, "unknown action");
   } catch (e) { return bad(500, "billing failed"); }
 };
+
+exports._test = { pending, lookupFirebaseToken };

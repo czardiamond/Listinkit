@@ -127,6 +127,7 @@
           <aside class="callout" aria-label="Early access">
             <p class="callout__head"><span class="hark-mark" data-size="16"></span> ListingKit Pro</p>
             <p class="callout__lead"><strong>Want flyers, your logo on everything and unlimited listings?</strong> Join ListingKit early access. The first 100 agents get 3 months of Pro free.</p>
+            <p class="callout__sub">Paid checkout is currently unavailable while durable payment fulfilment is being implemented. Contact us for early access instead.</p>
             <div class="links">
               <a class="btn" href="https://wa.me/2349133227445?text=Hi%20ListingKit%2C%20I%20tried%20the%20free%20generator%20and%20I%27d%20like%20early%20access." target="_blank" rel="noopener">Join on WhatsApp</a>
               <a class="btn" href="mailto:anyanwudiamond@gmail.com?subject=ListingKit%20early%20access">Join by email</a>
@@ -148,7 +149,7 @@
           <div class="cards">
             <div><h3>Is it free?</h3><p>Yes. Generate as many captions as you like.</p></div>
             <div><h3>Does it work for any country and currency?</h3><p>Yes. Type any area, city and country, and choose naira, dollars, pounds, euros, cedis or shillings.</p></div>
-            <div><h3>Do you store my data?</h3><p>No. Everything runs in your browser; nothing is sent or saved.</p></div>
+            <div><h3>Do you store my data?</h3><p>Generated content is transient unless you explicitly save it to Private work while signed in. Anonymous work is not persisted.</p></div>
           </div>
         </section>
       </main>
@@ -158,7 +159,7 @@
         <a class="badge" href="https://hark.com/" target="_blank" rel="noopener"><span class="hark-mark"></span><span>built by hark</span></a>
       </footer>
     </div>
-    <script src="hark.js"></script>
+    <script src="../memory-config.js"></script><script src="../memory/bootstrap.js"></script><script src="../memory-bridge.js"></script><script src="hark.js"></script>
     <script>
       (function () {
         var FEATS = [
@@ -423,10 +424,17 @@
         aiNote.className = "x-ai-note"; aiNote.style.cssText = "margin:0 0 12px;font-size:14px;opacity:.8";
         results.parentNode.insertBefore(aiNote, results);
         var busy = false;
-        function ai() {
+        async function currentToken() {
+          var u = window.projectMemory && window.projectMemory.user;
+          if (!u || u.isAnonymous || typeof u.getIdToken !== "function") return null;
+          try { return await u.getIdToken(); } catch (e) { return null; }
+        }
+        async function ai() {
           if (busy) return; busy = true;
+          var token = await currentToken();
+          if (!token) { aiNote.textContent = "AI generation is unavailable until you sign in with a configured account."; busy = false; return; }
           aiNote.textContent = "✨ Writing fresh AI copy for this listing…";
-          fetch("/.netlify/functions/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(read()) })
+          fetch("/.netlify/functions/generate", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + token }, body: JSON.stringify(read()) })
             .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
             .then(function (o) {
               var n = 0;
@@ -438,16 +446,17 @@
         }
 
         // ---- Plans & billing (Paystack) ----
-        var LS = window.localStorage, FREE = 3;
+        // Entitlement is deliberately transient: the server is authoritative and no JWT/payment state is stored in browser storage.
+        var entitlement = null, usage = {}, FREE = 3;
         function month() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1); }
-        function pro() { try { var t = JSON.parse(LS.getItem("lk_pro") || "null"); return t && t.exp > Date.now() ? t : null; } catch (e) { return null; } }
-        function used() { try { var u = JSON.parse(LS.getItem("lk_use") || "{}"); return u.m === month() ? u.n : 0; } catch (e) { return 0; } }
-        function useOne() { if (!pro()) LS.setItem("lk_use", JSON.stringify({ m: month(), n: used() + 1 })); }
+        function pro() { return entitlement && entitlement.uid === (window.projectMemory && window.projectMemory.user && window.projectMemory.user.uid) ? entitlement : null; }
+        function used() { return usage.m === month() ? usage.n : 0; }
+        function useOne() { if (!pro()) usage = { m: month(), n: used() + 1 }; }
         function canUse() { return !!pro() || used() < FREE; }
         var plans = document.createElement("div");
         plans.className = "x-plans"; plans.style.cssText = "display:none;border:1px solid currentColor;border-radius:14px;padding:16px;margin:0 0 16px";
         plans.innerHTML = '<p class="x-plans-msg" style="margin:0 0 10px;font-weight:600"></p>' +
-          '<label class="x-field"><span>Your email</span><input type="email" id="lk-email" placeholder="you@agency.com" autocomplete="email" /></label>' +
+          '<p class="x-plans-account">Sign in with your configured account to continue. No payment or account state is stored in this browser.</p>' +
           '<div class="links" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
           '<button type="button" class="btn" data-plan="pro">Pro: ₦5,000/month</button>' +
           '<button type="button" class="btn" data-plan="agency">Agency: ₦15,000/month</button>' +
@@ -459,25 +468,25 @@
         results.parentNode.insertBefore(plans, results);
         function meter() {
           var p = pro();
-          meterEl.innerHTML = p ? "✅ ListingKit " + (p.plan === "agency" ? "Agency" : "Pro") + ": unlimited AI listings (" + p.email + ")" :
+          meterEl.innerHTML = p ? "✅ ListingKit " + (p.plan === "agency" ? "Agency" : "Pro") + ": unlimited AI listings for this signed-in account" :
             "Free plan: " + Math.max(0, FREE - used()) + " of " + FREE + " AI listings left this month · <a href=\"#\" id=\"lk-up\">Upgrade</a>";
           var up = document.getElementById("lk-up");
           if (up) up.onclick = function (e) { e.preventDefault(); showPlans("Unlimited AI listing copy. Cancel anytime."); };
         }
         function showPlans(msg) { plans.style.display = "block"; plans.querySelector(".x-plans-msg").textContent = msg; plans.scrollIntoView({ behavior: "smooth", block: "center" }); }
         function status(t) { plans.querySelector(".x-plans-status").textContent = t; }
-        function saveTok(o) { LS.setItem("lk_pro", JSON.stringify({ email: o.email, plan: o.plan, token: o.token, exp: Date.now() + 35 * 864e5 })); }
-        function bill(body) { return fetch("/.netlify/functions/billing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); }); }
+        function saveTok(o) { entitlement = { uid: o.uid, plan: o.plan }; }
+        async function bill(body) { var token = await currentToken(); if (!token) throw new Error("Sign in required"); return fetch("/.netlify/functions/billing", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + token }, body: JSON.stringify(body) }).then(function (r) { return r.json(); }); }
+        window.addEventListener("project-memory-change", function () { if (!pro()) entitlement = null; meter(); });
         plans.addEventListener("click", function (e) {
           var b = e.target.closest("button"); if (!b) return;
-          var em = (document.getElementById("lk-email").value || "").trim();
-          if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { status("Enter your email first."); return; }
+          if (!window.projectMemory || !window.projectMemory.authenticated) { status("Sign in with a configured non-anonymous account first."); return; }
           if (b.dataset.plan) {
             status("Opening secure Paystack checkout…");
-            bill({ action: "checkout", email: em, plan: b.dataset.plan }).then(function (o) { if (o.url) location.href = o.url; else status(o.error || "Checkout failed. Try again."); }, function () { status("Checkout failed. Try again."); });
+            bill({ action: "checkout", plan: b.dataset.plan }).then(function (o) { if (o.url) location.href = o.url; else status(o.error || "Checkout unavailable."); }, function (e) { status(e.message || "Checkout unavailable."); });
           } else {
             status("Checking your subscription…");
-            bill({ action: "verify", email: em }).then(function (o) { if (o.active) { saveTok(o); plans.style.display = "none"; meter(); } else status("No active subscription found for that email."); }, function () { status("Couldn't check right now."); });
+            status("Use the payment confirmation link from this session; standalone email lookup is unavailable.");
           }
         });
         (function () {
@@ -485,8 +494,8 @@
           if (!ref) return;
           showPlans("Confirming your payment…");
           bill({ action: "verify", reference: ref }).then(function (o) {
-            if (o.active) { saveTok(o); plans.style.display = "none"; meter(); aiNote.textContent = "🎉 Payment confirmed. Unlimited AI listings unlocked."; history.replaceState(null, "", location.pathname); }
-            else status("We couldn't confirm that payment yet. Use \"I already paid\" in a minute.");
+            if (o.active) { saveTok(o); plans.style.display = "none"; meter(); aiNote.textContent = "Payment confirmed for this signed-in account."; history.replaceState(null, "", location.pathname); }
+            else status("Payment could not be confirmed for this signed-in account.");
           });
         })();
         function fallbackCopy(t) {
@@ -517,6 +526,7 @@
           e.preventDefault();
           Object.keys(seeds).forEach(function (k) { seeds[k] = Math.floor(Math.random() * 4); });
           render();
+          window.dispatchEvent(new CustomEvent("project-memory-work", { detail: { id: "listingkit-" + Date.now(), label: "ListingKit generated listing", input: read(), output: Object.fromEntries(CARDS.map(function (c) { return [c[0], document.getElementById("out-" + c[0]).textContent]; })) } }));
           results.scrollIntoView({ behavior: "smooth", block: "start" });
           if (canUse()) { useOne(); ai(); } else { aiNote.textContent = ""; showPlans("You've used your 3 free AI listings this month. Template copy is shown above; upgrade for unlimited AI copy."); }
           meter();

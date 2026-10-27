@@ -102,13 +102,37 @@
   function behaviors() {
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var btn = doc.getElementById("theme-btn"), mq = window.matchMedia("(prefers-color-scheme: dark)");
-    try { var saved = localStorage.getItem("hark-theme"); if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved); } catch (e) { /* storage blocked: follow the system theme */ }
+    var memoryClient = null, themeUid = null, themeNotice;
+    function account() {
+      var state = window.projectMemoryState || {};
+      return memoryClient && memoryClient.user && !memoryClient.user.isAnonymous && !state.loading ? memoryClient.user : null;
+    }
+    function notice(text) {
+      if (!themeNotice) { themeNotice = doc.createElement("span"); themeNotice.setAttribute("aria-live", "polite"); themeNotice.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"; if (btn) btn.parentNode.appendChild(themeNotice); }
+      themeNotice.textContent = text;
+    }
+    function clearTheme() { themeUid = null; root.removeAttribute("data-theme"); }
+    function restoreTheme() {
+      var user = account();
+      if (!user || user.uid !== themeUid) clearTheme();
+      if (!user) return;
+      themeUid = user.uid;
+      try {
+        var saved = memoryClient.get("hark-theme");
+        if (themeUid === user.uid && (saved === "light" || saved === "dark")) root.setAttribute("data-theme", saved);
+        label();
+      } catch (e) { notice("Could not restore your saved theme; using this visit's choice."); }
+    }
+    if (window.projectMemoryReady) window.projectMemoryReady.then(function (client) { memoryClient = client; restoreTheme(); }).catch(function () { clearTheme(); });
+    window.addEventListener("project-memory-change", function (e) { var next = e.detail || window.projectMemoryState || {}; if (next.loading || !next.user || next.user.isAnonymous || (themeUid && next.user.uid !== themeUid)) clearTheme(); else if (next.user.uid !== themeUid) restoreTheme(); });
     function current() { var t = root.getAttribute("data-theme"); return t === "light" || t === "dark" ? t : (mq.matches ? "dark" : "light"); }
     function label() { if (btn) btn.setAttribute("aria-label", current() === "dark" ? "Switch to light theme" : "Switch to dark theme"); }
     if (btn) btn.addEventListener("click", function () {
       var next = current() === "dark" ? "light" : "dark";
       root.setAttribute("data-theme", next);
-      try { localStorage.setItem("hark-theme", next); } catch (e) { /* storage blocked: the choice lasts this visit */ }
+      var user = account();
+      if (!user) { notice("Theme choice applies for this visit only. Sign in to save it."); label(); return; }
+      memoryClient.set("hark-theme", next).then(function () { notice("Theme saved to your account."); }).catch(function () { notice("Theme changed for this visit, but could not be saved to your account."); });
       label();
     });
     label();
